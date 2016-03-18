@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.BusProvider;
 import com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.events.FetchMovieListEvent;
+import com.siolabs.ashutoshsingh.p1_popularmovies.models.ListParams;
 import com.siolabs.ashutoshsingh.p1_popularmovies.models.Movie;
 import com.siolabs.ashutoshsingh.p1_popularmovies.models.MovieResponse;
 import com.squareup.otto.Subscribe;
@@ -45,6 +47,10 @@ public class MovieGridFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private boolean loading = true;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+
+    private GridLayoutManager mLayoutManager;
     private RecyclerView mMovieGridRecyclerView;
     private List<MovieResponse> movieList;
     private MovieAdapter adapter;
@@ -90,7 +96,8 @@ public class MovieGridFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         mMovieGridRecyclerView = (RecyclerView) view.findViewById(R.id.movie_grid_recycler_view);
-        mMovieGridRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));;
+        mLayoutManager = new GridLayoutManager(getActivity(),2);
+        mMovieGridRecyclerView.setLayoutManager(mLayoutManager);;
 
         //movieList = getResults();
         movieList = new ArrayList<MovieResponse>();
@@ -98,10 +105,41 @@ public class MovieGridFragment extends Fragment {
         mMovieGridRecyclerView.setAdapter(adapter);
         //mMovieGridRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
 
-        if(movieList == null || movieList.size() < 1)
-        BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart("POPULAR"));
+        ListParams params = new ListParams(1, "POPULAR");
+
+        BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart(params));
 
 
+        mMovieGridRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if(dy > 0) //check for scroll down
+                {
+                    visibleItemCount = mLayoutManager.getChildCount();
+                    totalItemCount = mLayoutManager.getItemCount();
+                    pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                    if (loading)
+                    {
+                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount)
+                        {
+                            loading = false;
+
+                            Log.v("...", "Last Item Wow !");
+                            ListParams params = new ListParams(1+totalItemCount/20,"POPULAR");
+                            BusProvider.getInstance().post(new FetchMovieListEvent
+                                    .OnLoadingStart(params));
+                            //Do pagination.. i.e. fetch new data
+                        }
+                    }
+                }
+            }
+        });
 
 
         return view;
@@ -231,7 +269,11 @@ public class MovieGridFragment extends Fragment {
 
     @Subscribe
     public void onMovieListLoaded(FetchMovieListEvent.OnLoaded onLoaded){
-        movieList.clear();
+
+        loading = true;
+        if(onLoaded.getResponse().getId() ==1)
+            movieList.clear();
+
         movieList.addAll(onLoaded.getResponse().getResults());
         Log.d("GOT LIST",""+movieList.size());
         adapter.notifyDataSetChanged();

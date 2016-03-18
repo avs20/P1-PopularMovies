@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 
 import com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.BusProvider;
 import com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.events.FetchMovieListEvent;
+import com.siolabs.ashutoshsingh.p1_popularmovies.models.ListParams;
 import com.siolabs.ashutoshsingh.p1_popularmovies.models.Movie;
 import com.siolabs.ashutoshsingh.p1_popularmovies.models.MovieResponse;
 import com.squareup.otto.Bus;
@@ -98,13 +99,14 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_popularity:
-                BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart("POPULAR"));
+
+                BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart(new ListParams(1,"POPULAR")));
                 title = "Popular Movies";
                 getSupportActionBar().setTitle(title);
                 return true;
             case R.id.action_rating:
                 title = "Top Rated Movies";
-                BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart("RATED"));
+                BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart(new ListParams(1,"TRENDING")));
                 getSupportActionBar().setTitle(title);
                 return true;
 

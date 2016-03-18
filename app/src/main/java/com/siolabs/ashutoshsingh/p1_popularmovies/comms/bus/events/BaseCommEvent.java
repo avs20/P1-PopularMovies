@@ -13,22 +13,19 @@ public class BaseCommEvent {
 
     protected static class OnStart<Rq> {
         private Rq mRequest;
-        private String path;
 
         public OnStart(Rq request) {
             mRequest = request;
         }
 
         public OnStart(Rq request, String param){
-            mRequest = request;
-            path = param;
         }
 
         public Rq getRequest() {
             return mRequest;
         }
 
-        public String getPath() { return path;}
+
     }
 
 

@@ -35,13 +35,17 @@ public class MovieManager {
     @Subscribe
     public void onLoadMovies(FetchMovieListEvent.OnLoadingStart onLoadingStart){
 
-        if(onLoadingStart.getRequest().equalsIgnoreCase("POPULAR"))
+        int page = onLoadingStart.getRequest().getPage();
+        String sortOrder = onLoadingStart.getRequest().getSortOrder();
+
+        if (sortOrder.equalsIgnoreCase("POPULAR")){
             mMovieClient.getMovieService()
-                    .getPopularMovies()
+                    .getPopularMovies(page)
                     .enqueue(new MyResponse());
+        }
         else
             mMovieClient.getMovieService()
-                    .getTopRatedMovies()
+                    .getTopRatedMovies(page)
                     .enqueue(new MyResponse());
     }
 

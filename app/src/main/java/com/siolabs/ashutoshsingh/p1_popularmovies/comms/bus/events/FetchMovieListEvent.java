@@ -1,6 +1,7 @@
 package com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.events;
 
 import com.siolabs.ashutoshsingh.p1_popularmovies.models.ApiResponse;
+import com.siolabs.ashutoshsingh.p1_popularmovies.models.ListParams;
 import com.siolabs.ashutoshsingh.p1_popularmovies.models.Movie;
 
 import java.util.List;
@@ -18,9 +19,9 @@ public class FetchMovieListEvent extends BaseCommEvent {
         }
     }
 
-    public static class OnLoadingStart extends OnStart<String> {
-        public OnLoadingStart(String sortOrder) {
-            super(sortOrder);
+    public static class OnLoadingStart extends OnStart<ListParams> {
+        public OnLoadingStart(ListParams p) {
+            super(p);
         }
     }
 
