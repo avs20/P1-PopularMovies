@@ -7,12 +7,16 @@
     android:fitsSystemWindows="true"
     tools:context="com.siolabs.ashutoshsingh.p1_popularmovies.DetailActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:name="com.siolabs.ashutoshsingh.p1_popularmovies.MovieDetailsFragment"
         android:id="@+id/movie_details_container"
         />
+    </ScrollView>
 
 
 </android.support.design.widget.CoordinatorLayout>
