@@ -1,27 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context="com.siolabs.ashutoshsingh.p1_popularmovies.MainActivity">
-    
 
 
 
-    <FrameLayout
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/movie_grid_fragment"-->
+        <!--&gt;</FrameLayout>-->
+
+    <fragment
+        android:id="@+id/movie_grid_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/main_placeholder"
-        >
+        android:name="com.siolabs.ashutoshsingh.p1_popularmovies.MovieGridFragment"
+        tools:layout="@layout/fragment_movie_grid"
 
-
-    </FrameLayout>
-
-
+        />
 
 
 
 
 
-</RelativeLayout>
+
+
+
+
+
+
+</FrameLayout>

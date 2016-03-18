@@ -85,6 +85,7 @@ public class MovieGridFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setRetainInstance(true);
         // Inflate the layout for this fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_movie_grid, container, false);
@@ -97,6 +98,7 @@ public class MovieGridFragment extends Fragment {
         mMovieGridRecyclerView.setAdapter(adapter);
         //mMovieGridRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
 
+        if(movieList == null || movieList.size() < 1)
         BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart("POPULAR"));
 
 

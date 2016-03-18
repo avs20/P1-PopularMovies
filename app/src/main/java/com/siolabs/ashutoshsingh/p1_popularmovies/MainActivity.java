@@ -1,5 +1,6 @@
 package com.siolabs.ashutoshsingh.p1_popularmovies;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -9,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.BusProvider;
 import com.siolabs.ashutoshsingh.p1_popularmovies.comms.bus.events.FetchMovieListEvent;
@@ -23,27 +25,39 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     Toolbar toolbar;
     String title;
 
+    boolean isTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        determinPaneLayout();
+
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
 
-
         title = "Popular Movies";
-
-        gridFragment = new MovieGridFragment();
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-// Replace the contents of the container with the new fragment
-        ft.replace(R.id.main_placeholder, gridFragment);
-// or ft.add(R.id.your_placeholder, new FooFragment());
-// Complete the changes added above
-        ft.commit();
-
-
         getSupportActionBar().setTitle(title);
+
+//        gridFragment = new MovieGridFragment();
+//
+//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        // Replace the contents of the container with the new fragment
+//        ft.replace(R.id.movie_grid_fragment, gridFragment);
+//        // or ft.add(R.id.your_placeholder, new FooFragment());
+//        // Complete the changes added above
+//        ft.commit();
+
+    }
+
+    private void determinPaneLayout() {
+
+        FrameLayout detailContainer = (FrameLayout) findViewById(R.id.detailsContainer);
+        if(detailContainer != null)
+            isTwoPane = true;
+        else
+            isTwoPane = false;
+
 
 
     }
@@ -51,20 +65,22 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     @Override
     public void onFragmentInteraction(MovieResponse m) {
 
-
-
-
-
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
+        if(isTwoPane){
+            ft.replace(R.id.detailsContainer,MovieDetailsFragment.newInstance(m));
+            ft.commit();
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(m.getOriginal_title());
+
+            return;
+        }else{
+            Intent intent = new Intent(this,DetailActivity.class);
+            intent.putExtra(AppConstans.ARG_MOVIE,m);
+            startActivity(intent);
+        }
 
 
-        ft.replace(R.id.main_placeholder,MovieDetailsFragment.newInstance(m));
-
-        ft.commit();
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(m.getOriginal_title());
 
 
 
@@ -91,8 +107,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
                 BusProvider.getInstance().post(new FetchMovieListEvent.OnLoadingStart("RATED"));
                 getSupportActionBar().setTitle(title);
                 return true;
-            case android.R.id.home:
-                onBackPressed();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -100,28 +114,13 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     }
 
 
-    @Override
-    public void onBackPressed() {
 
-
-        Fragment  current = getSupportFragmentManager().findFragmentById(R.id.main_placeholder);
-        if(current instanceof MovieDetailsFragment){
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_placeholder,gridFragment).commit();
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            getSupportActionBar().setTitle(title);
-            return;
-        }
-
-
-
-
-        super.onBackPressed();
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
         BusProvider.getInstance().register(this);
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
